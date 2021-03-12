@@ -28,18 +28,56 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const emptyForm = { name: '', surname: '', email: '', phone: '' };
+const emptyForm = {name: '', surname: '', email: '', phone: ''};
 
 const CustomerForm = () => {
     const classes = useStyles();
     const [form, setForm] = useState(emptyForm);
     const [open, setOpen] = useState(false);
     const [feedback, setFeedback] = useState({});
+    const [formError, setFormError] = useState({});
+
+    const requireFields = (errors) => {
+        const requiredFields = Object.keys(errors)
+            .filter(field => !!errors[field])
+            .join(', ');
+
+        setFeedback({
+            severity: 'error',
+            message: `Please fill required fields: ${requiredFields}`
+        });
+        openSnackbar();
+    };
+
+    const validateForm = () => {
+        const errors = {};
+        let valid = true;
+
+        Object.keys(form)
+            .forEach(field => {
+                if(!form[field]) {
+                    errors[field] = true;
+                    valid = false;
+                }
+            });
+        setFormError(errors);
+
+        if (!valid) requireFields(errors);
+
+        return valid;
+    };
+
+    const resetForm = () => {
+        setForm(emptyForm);
+        setFormError({});
+    };
 
     const onSubmit = () => {
+        if (!validateForm()) return;
+
         createCustomer(form)
             .then(res => {
-                setForm(emptyForm);
+                resetForm();
                 setFeedback({
                     severity: 'success',
                     message: `You have successfully created a customer for ${res.data.name} ${res.data.surname}.`
@@ -54,7 +92,7 @@ const CustomerForm = () => {
                 } else {
                     message = 'An error occurred while creating a customer!';
                 }
-                setFeedback({ severity: 'error', message });
+                setFeedback({severity: 'error', message});
             })
             .finally(openSnackbar);
     };
@@ -84,6 +122,7 @@ const CustomerForm = () => {
                             required
                             fullWidth
                             id="firstName"
+                            error={formError.name}
                             value={form.name}
                             onChange={({target}) => setForm({...form, name: target.value})}
                             label="First Name"
@@ -98,6 +137,7 @@ const CustomerForm = () => {
                             id="lastName"
                             label="Last Name"
                             name="lastName"
+                            error={formError.surname}
                             value={form.surname}
                             onChange={({target}) => setForm({...form, surname: target.value})}
                         />
@@ -110,6 +150,7 @@ const CustomerForm = () => {
                             id="email"
                             label="Email Address"
                             name="email"
+                            error={formError.email}
                             value={form.email}
                             onChange={({target}) => setForm({...form, email: target.value})}
                         />
@@ -123,6 +164,7 @@ const CustomerForm = () => {
                             label="Phone"
                             type="text"
                             id="phone"
+                            error={formError.phone}
                             value={form.phone}
                             onChange={({target}) => setForm({...form, phone: target.value})}
                         />
