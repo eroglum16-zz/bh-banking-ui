@@ -5,7 +5,12 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import {makeStyles} from '@material-ui/core/styles';
 import {createCustomer} from '../../../service/customerService';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -23,15 +28,46 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const emptyForm = { name: '', surname: '', email: '', phone: '' };
+
 const CustomerForm = () => {
     const classes = useStyles();
-    const [form, setForm] = useState({});
+    const [form, setForm] = useState(emptyForm);
+    const [open, setOpen] = useState(false);
+    const [feedback, setFeedback] = useState({});
 
     const onSubmit = () => {
         createCustomer(form)
-            .then(data => {
-                setForm({});
-            });
+            .then(res => {
+                setForm(emptyForm);
+                setFeedback({
+                    severity: 'success',
+                    message: `You have successfully created a customer for ${res.data.name} ${res.data.surname}.`
+                });
+            })
+            .catch(error => {
+                let message;
+                if (!error.response) {
+                    message = 'Server is not responding, please try in a bit!';
+                } else if (error.response.status === 409) {
+                    message = 'This email is taken by another customer!';
+                } else {
+                    message = 'An error occurred while creating a customer!';
+                }
+                setFeedback({ severity: 'error', message });
+            })
+            .finally(openSnackbar);
+    };
+
+    const openSnackbar = () => {
+        setOpen(true);
+    };
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
     };
 
     return (
@@ -43,7 +79,6 @@ const CustomerForm = () => {
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <TextField
-                            autoComplete="fname"
                             name="firstName"
                             variant="outlined"
                             required
@@ -65,7 +100,6 @@ const CustomerForm = () => {
                             name="lastName"
                             value={form.surname}
                             onChange={({target}) => setForm({...form, surname: target.value})}
-                            autoComplete="lname"
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -78,7 +112,6 @@ const CustomerForm = () => {
                             name="email"
                             value={form.email}
                             onChange={({target}) => setForm({...form, email: target.value})}
-                            autoComplete="email"
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -106,6 +139,11 @@ const CustomerForm = () => {
                     Save
                 </Button>
             </form>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={feedback.severity}>
+                    {feedback.message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 };
