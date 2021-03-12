@@ -7,6 +7,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import {createCustomer} from '../../../service/customerService';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -26,6 +28,10 @@ const useStyles = makeStyles((theme) => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    }
 }));
 
 const emptyForm = {name: '', surname: '', email: '', phone: ''};
@@ -36,6 +42,7 @@ const CustomerForm = () => {
     const [open, setOpen] = useState(false);
     const [feedback, setFeedback] = useState({});
     const [formError, setFormError] = useState({});
+    const [requestPending, setRequestPending] = useState(false);
 
     const requireFields = (errors) => {
         const requiredFields = Object.keys(errors)
@@ -54,11 +61,10 @@ const CustomerForm = () => {
         let valid = true;
 
         Object.keys(form)
+            .filter(field => !form[field])
             .forEach(field => {
-                if(!form[field]) {
-                    errors[field] = true;
-                    valid = false;
-                }
+                errors[field] = true;
+                valid = false;
             });
         setFormError(errors);
 
@@ -75,12 +81,13 @@ const CustomerForm = () => {
     const onSubmit = () => {
         if (!validateForm()) return;
 
+        setRequestPending(true);
         createCustomer(form)
             .then(res => {
                 resetForm();
                 setFeedback({
                     severity: 'success',
-                    message: `You have successfully created a customer for ${res.data.name} ${res.data.surname}.`
+                    message: `You have successfully created a customer with id ${res.data.customerId}.`
                 });
             })
             .catch(error => {
@@ -94,7 +101,10 @@ const CustomerForm = () => {
                 }
                 setFeedback({severity: 'error', message});
             })
-            .finally(openSnackbar);
+            .finally(() => {
+                setRequestPending(false);
+                openSnackbar();
+            });
     };
 
     const openSnackbar = () => {
@@ -186,6 +196,9 @@ const CustomerForm = () => {
                     {feedback.message}
                 </Alert>
             </Snackbar>
+            <Backdrop className={classes.backdrop} open={requestPending}>
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </div>
     );
 };
