@@ -39,19 +39,20 @@ const AccountForm = () => {
     const [formError, setFormError] = useState({});
     const [requestPending, setRequestPending] = useState(false);
 
+    const notify = (severity, message) => {
+        setFeedback({severity, message});
+        openSnackbar();
+    };
+
     const requireFields = (errors) => {
         const requiredFields = Object.keys(errors)
             .filter(field => !!errors[field])
             .join(', ');
 
-        setFeedback({
-            severity: 'error',
-            message: `Please fill required fields: ${requiredFields}`
-        });
-        openSnackbar();
+        notify('error', `Please fill required fields: ${requiredFields}`);
     };
 
-    const validateForm = () => {
+    const checkRequired = () => {
         const errors = {};
         let valid = true;
 
@@ -64,8 +65,19 @@ const AccountForm = () => {
         setFormError(errors);
 
         if (!valid) requireFields(errors);
-
         return valid;
+    };
+
+    const checkInitialCreditPositive = () => {
+        if (form.initialCredit < 0) {
+            notify('error', 'Initial credit should be a positive value.');
+            return false;
+        }
+        return true;
+    };
+
+    const validateForm = () => {
+        return checkRequired() && checkInitialCreditPositive();
     };
 
     const resetForm = () => {
