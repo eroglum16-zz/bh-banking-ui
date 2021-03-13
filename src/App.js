@@ -1,5 +1,5 @@
 import React from "react";
-import {Route, Switch, Router} from 'react-router';
+import {Route, Switch} from 'react-router';
 import './App.css';
 import Layout from "./app/layout/Layout";
 

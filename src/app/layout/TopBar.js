@@ -33,8 +33,8 @@ const TopBar = () => {
                     <Typography variant="h6" className={classes.title}>
                         BH Banking
                     </Typography>
-                    <Button color="inherit">Customer</Button>
-                    <Button color="inherit">Account</Button>
+                    <Button href="/customer" color="inherit">Customer</Button>
+                    <Button href="/account" color="inherit">Account</Button>
                 </Toolbar>
             </AppBar>
         </div>
