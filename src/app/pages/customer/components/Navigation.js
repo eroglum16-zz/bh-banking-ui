@@ -1,5 +1,5 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import BottomNavigation from '@material-ui/core/BottomNavigation';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import AddIcon from '@material-ui/icons/Add';
@@ -26,8 +26,8 @@ const Navigation = ({value, setValue}) => {
             showLabels
             className={classes.root}
         >
-            <BottomNavigationAction label="New" icon={<AddIcon />} />
-            <BottomNavigationAction label="Info" icon={<ContactMailIcon />} />
+            <BottomNavigationAction label="New" icon={<AddIcon/>}/>
+            <BottomNavigationAction label="Info" icon={<ContactMailIcon/>}/>
         </BottomNavigation>
     );
 };
