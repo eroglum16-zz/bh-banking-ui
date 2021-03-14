@@ -3,9 +3,6 @@ import MuiAlert from '@material-ui/lab/Alert';
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import Card from "@material-ui/core";
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import AccountCard from "./AccountCard";
 
 function Alert(props) {
@@ -17,31 +14,30 @@ const CustomerInfo = ({customer, errorMessage}) => {
         <Box style={{marginTop: 30}}>
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             {customer &&
-                <Grid container direction="column">
-                    <Grid item>
-                        <Typography variant="h4" align="center">
-                            {customer.name} {customer.surname}
-                        </Typography>
-                        <Typography variant="subtitle1" align="center" style={{color: '#666'}}>
-                            {customer.email}
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <Grid container
-                              spacing={1}
-                              style={{marginTop: 20, height: 250, overflow: 'auto'}}>
-                            {customer.accounts.map((account) => (
-                                <Grid key={account.accountId} xs={6} item>
-                                    <AccountCard account={account} />
-                                </Grid>
-                            ))}
-                        </Grid>
+            <Grid container direction="column">
+                <Grid item>
+                    <Typography variant="h4" align="center">
+                        {customer.name} {customer.surname}
+                    </Typography>
+                    <Typography variant="subtitle1" align="center" style={{color: '#666'}}>
+                        {customer.email}
+                    </Typography>
+                </Grid>
+                <Grid item>
+                    <Grid container
+                          spacing={1}
+                          style={{marginTop: 20, height: 250, overflow: 'auto'}}>
+                        {customer.accounts.map((account) => (
+                            <Grid key={account.accountId} xs={6} item>
+                                <AccountCard account={account}/>
+                            </Grid>
+                        ))}
                     </Grid>
                 </Grid>
+            </Grid>
             }
         </Box>
     )
-
 };
 
 export default CustomerInfo;

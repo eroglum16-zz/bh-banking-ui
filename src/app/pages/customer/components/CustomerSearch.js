@@ -14,7 +14,8 @@ const CustomerSearch = ({onSearch}) => {
                            variant="outlined"
                            size="small"
                            value={value}
-                           onChange={({target}) => setValue(target.value)}/>
+                           onChange={({target}) => setValue(target.value)}
+                           autoFocus/>
             </Grid>
             <Grid item xs={3}>
                 <Button color="primary"
